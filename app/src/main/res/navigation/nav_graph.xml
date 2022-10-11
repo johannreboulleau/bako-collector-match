@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/nav_graph"
+            app:startDestination="@id/HomeFragment">
+
+    <fragment
+            android:id="@+id/HomeFragment"
+            android:name="com.bakoconsigne.bako_collector_match.ui.home.HomeFragment"
+            android:label="@string/main_home_title"
+            tools:layout="@layout/fragment_main_home">
+
+        <action
+                android:id="@+id/action_navigation_home_to_navigation_scan"
+                app:destination="@id/ScanBoxFragment"/>
+    </fragment>
+
+    <fragment
+            android:id="@+id/ScanBoxFragment"
+            android:name="com.bakoconsigne.bako_collector_match.ui.step1.ScanBoxFragment"
+            android:label="@string/main_scanbox_title"
+            tools:layout="@layout/fragment_main_scanbox">
+
+        <action
+                android:id="@+id/action_navigation_scan_to_navigation_home"
+                app:destination="@id/HomeFragment"/>
+
+        <action
+                android:id="@+id/action_navigation_scan_to_opendrawer"
+                app:destination="@id/OpenDrawerFragment"/>
+
+        <action
+                android:id="@+id/action_navigation_scan_to_choice"
+                app:destination="@id/ChoiceFragment"/>
+    </fragment>
+
+    <fragment
+            android:id="@+id/OpenDrawerFragment"
+            android:name="com.bakoconsigne.bako_collector_match.ui.step2.OpenDrawerFragment"
+            android:label="@string/main_opendrawer_title"
+            tools:layout="@layout/fragment_main_opendrawer">
+
+        <action
+                android:id="@+id/action_navigation_opendrawer_to_closedrawer"
+                app:destination="@id/CloseDrawerFragment"/>
+
+        <action
+                android:id="@+id/action_navigation_opendrawer_to_home"
+                app:destination="@id/HomeFragment"/>
+    </fragment>
+
+    <fragment
+            android:id="@+id/CloseDrawerFragment"
+            android:name="com.bakoconsigne.bako_collector_match.ui.step3.CloseDrawerFragment"
+            android:label="@string/main_closedrawer_title"
+            tools:layout="@layout/fragment_main_closedrawer">
+
+        <action
+                android:id="@+id/action_navigation_closedrawer_to_choice"
+                app:destination="@id/ChoiceFragment"/>
+    </fragment>
+
+    <fragment
+            android:id="@+id/ChoiceFragment"
+            android:name="com.bakoconsigne.bako_collector_match.ui.step4.ChoiceFragment"
+            android:label="@string/main_choice_title"
+            tools:layout="@layout/fragment_main_choice">
+
+        <action
+                android:id="@+id/action_navigation_choice_to_scanbox"
+                app:destination="@id/ScanBoxFragment"/>
+
+        <action
+                android:id="@+id/action_navigation_choice_to_voucher"
+                app:destination="@id/VoucherFragment"/>
+    </fragment>
+
+    <fragment
+            android:id="@+id/VoucherFragment"
+            android:name="com.bakoconsigne.bako_collector_match.ui.step5.VoucherFragment"
+            android:label="@string/main_voucher_title"
+            tools:layout="@layout/fragment_main_voucher">
+
+        <action
+                android:id="@+id/action_navigation_voucher_to_congratulations"
+                app:destination="@id/CongratulationsFragment"/>
+    </fragment>
+
+    <fragment
+            android:id="@+id/CongratulationsFragment"
+            android:name="com.bakoconsigne.bako_collector_match.ui.congratulations.CongratulationsFragment"
+            android:label="@string/main_congratulations_thanks"
+            tools:layout="@layout/fragment_main_congratulations">
+
+        <action
+                android:id="@+id/action_navigation_congratulations_to_home"
+                app:destination="@id/HomeFragment"/>
+    </fragment>
+
+
+</navigation>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="app/src/main/res/drawable/bg_green.xml" value="0.2665" />
+        <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.2665" />
+        <entry key="app/src/main/res/drawable/ic_more.xml" value="0.2665" />
+        <entry key="app/src/main/res/drawable/layout_border.xml" value="0.2665" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.17553191489361702" />
+        <entry key="app/src/main/res/layout/activity_settings.xml" value="0.17553191489361702" />
+        <entry key="app/src/main/res/layout/content_main.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/fragment_first.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/fragment_main_choice.xml" value="0.1337386018237082" />
+        <entry key="app/src/main/res/layout/fragment_main_closedrawer.xml" value="0.17553191489361702" />
+        <entry key="app/src/main/res/layout/fragment_main_congratulations.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/fragment_main_home.xml" value="0.17553191489361702" />
+        <entry key="app/src/main/res/layout/fragment_main_opendrawer.xml" value="0.17553191489361702" />
+        <entry key="app/src/main/res/layout/fragment_main_scanbox.xml" value="0.17553191489361702" />
+        <entry key="app/src/main/res/layout/fragment_main_voucher.xml" value="0.12386018237082067" />
+        <entry key="app/src/main/res/layout/fragment_second.xml" value="0.17553191489361702" />
+        <entry key="app/src/main/res/layout/fragment_settings_preferences.xml" value="0.17553191489361702" />
+        <entry key="app/src/main/res/layout/prompt.xml" value="0.17553191489361702" />
+      </map>
+    </option>
+  </component>
+  <component name="FrameworkDetectionExcludesConfiguration">
+    <file type="web" url="file://$PROJECT_DIR$" />
+  </component>
+  <component name="PDMPlugin">
+    <option name="skipTestSources" value="false" />
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>

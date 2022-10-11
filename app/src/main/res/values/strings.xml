@@ -1,0 +1,72 @@
+<resources>
+    <string name="app_name">bako-collector-match</string>
+    <string name="action_settings">Settings</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="next">Suivant</string>
+    <string name="previous">Précédent</string>
+
+    <!-- common actions -->
+    <string name="click_here">Cliquez ici</string>
+    <string name="retry">Ré-essayer</string>
+
+    <!-- header -->
+    <string name="header_logo_description">Bako Consigne</string>
+    <string name="header_logo_match_description">Match</string>
+    <string name="main_header_text">s\'associe pour un monde plus vert !</string>
+    <string name="main_header_text2">Ensemble, réduisons nos déchets d\'emballages, passons sur des contenants réutilisables.</string>
+
+    <!-- Arduino debug -->
+    <string name="arduino_title">Debug Mode</string>
+    <string name="arduino_action_send">Send</string>
+    <string name="arduino_action_status">Status</string>
+    <string name="arduino_action_check">Check</string>
+    <string name="arduino_action_open">Open</string>
+    <string name="arduino_action_close">Close</string>
+
+    <!-- bottom bar -->
+    <string name="main_bottomBar_support">Pour tout souci technique, appelez le 06.58.35.69.81</string>
+    <string name="main_bottomBar_home">Accueil</string>
+
+    <!-- Fragment Home -->
+    <string name="main_home_title">Accueil</string>
+    <string name="main_home_welcome">Bienvenue.</string>
+    <string name="main_home_instruction">Pour déposer vos contenants réutilisables consignés, suivez les indications…</string>
+
+    <!-- Fragment scan -->
+    <string name="main_scanbox_title">Scannez le contenant</string>
+    <string name="main_scanbox_step">1</string>
+    <string name="main_scanbox_instruction">Scannez le QR code situé sur le contenant.</string>
+    <string name="main_scanbox_error">Une erreur est survenue : le contenant n\'est pas reconnu.</string>
+    <string name="main_scanbox_image_description">Scannez le QR code situé sur le contenant.</string>
+
+    <!-- Fragment opendrawer -->
+    <string name="main_opendrawer_title">Ouvrez le tiroir indiqué par la lumière verte.</string>
+    <string name="main_opendrawer_step">2</string>
+
+    <!-- Fragment closedrawer -->
+    <string name="main_closedrawer_title">Déposez le contenant vide et son couvercle,\npuis refermez le tiroir.</string>
+    <string name="main_closedrawer_step">3</string>
+
+    <!-- Fragment Choice -->
+    <string name="main_choice_title">Que souhaitez-vous faire ?</string>
+    <string name="main_choice_button_deposit">Déposer un autre contenant</string>
+    <string name="main_choice_button_finish">Récupérer mon bon d\'achat</string>
+
+    <!-- Fragment Voucher -->
+    <string name="main_voucher_title">Récupérer le bon d\'achat Match *</string>
+    <string name="main_voucher_instruction">* utilisable sur tous les rayons alimentaires du magasin Match de votre choix</string>
+    <string name="main_voucher_step">4</string>
+
+    <!-- Fragment Congratulations -->
+    <string name="main_congratulations_thanks">Merci !</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings activity</string>
+    <string name="settings_preferences_header">Paramètres</string>
+    <string name="settings_preferences_token">Authentication token</string>
+    <string name="settings_preferences_siteId">Collector Identifiant</string>
+    <string name="settings_preferences_arduino_debug">Enable Arduino Debug</string>
+
+    <string name="login">Login</string>
+    <string name="password">Password</string>
+</resources>

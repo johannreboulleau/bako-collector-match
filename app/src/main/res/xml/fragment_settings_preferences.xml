@@ -1,0 +1,25 @@
+<PreferenceScreen
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+            app:title="@string/settings_preferences_header">
+
+        <EditTextPreference
+                app:key="bako_token"
+                app:title="@string/settings_preferences_token"
+                app:useSimpleSummaryProvider="true"
+        />
+
+        <EditTextPreference
+                app:key="bako_siteId"
+                app:title="@string/settings_preferences_siteId"
+                app:useSimpleSummaryProvider="true"/>
+
+        <CheckBoxPreference
+                app:key="bako_arduino_debug"
+                app:title="@string/settings_preferences_arduino_debug"
+                app:useSimpleSummaryProvider="true"/>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
