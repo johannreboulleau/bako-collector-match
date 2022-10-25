@@ -59,6 +59,10 @@
         <action
                 android:id="@+id/action_navigation_closedrawer_to_choice"
                 app:destination="@id/ChoiceFragment"/>
+
+        <action
+                android:id="@+id/action_navigation_closedrawer_to_voucher"
+                app:destination="@id/VoucherFragment"/>
     </fragment>
 
     <fragment
@@ -78,7 +82,7 @@
 
     <fragment
             android:id="@+id/VoucherFragment"
-            android:name="com.bakoconsigne.bako_collector_match.ui.step5.VoucherFragment"
+            android:name="com.bakoconsigne.bako_collector_match.ui.step4.VoucherFragment"
             android:label="@string/main_voucher_title"
             tools:layout="@layout/fragment_main_voucher">
 

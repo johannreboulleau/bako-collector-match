@@ -6,9 +6,12 @@ import com.bakoconsigne.bako_collector_match.dto.BoxTypeDto;
 import com.bakoconsigne.bako_collector_match.dto.DepositFormDto;
 import com.bakoconsigne.bako_collector_match.dto.LoginDto;
 import com.bakoconsigne.bako_collector_match.dto.LoginResponseDto;
+import com.bakoconsigne.bako_collector_match.dto.MonitoringDto;
 import com.bakoconsigne.bako_collector_match.dto.StockCollectorDTO;
 import com.bakoconsigne.bako_collector_match.dto.UserDto;
 import com.bakoconsigne.bako_collector_match.exceptions.BoxTypeSettingsException;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,6 +40,13 @@ public class CollectorService {
     private String siteId;
 
     private StockCollectorDTO stockCollector;
+
+    /**
+     * number of opened drawer
+     */
+    @Getter
+    @Setter
+    private Integer numDrawer;
 
     /**
      * private constructor
@@ -140,6 +150,8 @@ public class CollectorService {
 
     public void clear() {
         this.mapBox.clear();
+        this.stockCollector = null;
+        this.numDrawer = null;
     }
 
     /**
@@ -190,8 +202,28 @@ public class CollectorService {
         formDto.setMapBoxes(mapBox);
         formDto.setSiteId(siteId);
 
-        client.depositBoxes(formDto);
-        return true;
+        return client.depositBoxes(formDto);
+    }
+
+    /**
+     * Monitor collector status
+     *
+     * @return True if ok
+     *
+     * @throws IOException
+     *     I/O Exception
+     */
+    public boolean monitoring(final float batteryPercent, final String status) throws IOException {
+
+        final MonitoringDto monitoringDto = new MonitoringDto();
+        monitoringDto.setSiteId(siteId);
+        monitoringDto.setBatteryPercent(batteryPercent);
+        monitoringDto.setStatus(status);
+
+        if (client != null) {
+            return client.monitoring(monitoringDto);
+        }
+        return false;
     }
 
     /**

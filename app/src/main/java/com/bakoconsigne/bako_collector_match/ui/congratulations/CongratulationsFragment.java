@@ -22,10 +22,12 @@ public class CongratulationsFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_main_congratulations, container, false);
 
         TextView homeImageMenuLabel = requireActivity().findViewById(R.id.bottomAppBar_home_label);
-        homeImageMenuLabel.setVisibility(View.GONE);
+        homeImageMenuLabel.setVisibility(View.VISIBLE);
+        homeImageMenuLabel.setOnClickListener(v -> goToHome());
 
         ImageView homeImageMenu = requireActivity().findViewById(R.id.bottomAppBar_home);
-        homeImageMenu.setVisibility(View.GONE);
+        homeImageMenu.setVisibility(View.VISIBLE);
+        homeImageMenu.setOnClickListener(v -> goToHome());
 
         TextView prevImageMenuLabel = requireActivity().findViewById(R.id.bottomAppBar_prev_label);
         if (prevImageMenuLabel != null) {

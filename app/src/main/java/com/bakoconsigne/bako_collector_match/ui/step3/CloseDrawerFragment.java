@@ -1,6 +1,7 @@
 package com.bakoconsigne.bako_collector_match.ui.step3;
 
 import android.annotation.SuppressLint;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.LayoutInflater;
@@ -19,6 +20,7 @@ import com.bakoconsigne.bako_collector_match.services.CollectorService;
 import com.bakoconsigne.bako_collector_match.utils.Utils;
 import com.google.zxing.client.android.BeepManager;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -36,13 +38,9 @@ public class CloseDrawerFragment extends Fragment implements CustomArduinoListen
 
     private final ArduinoService arduinoService = ArduinoService.getInstance();
 
-    private TextView textViewArduinoMessage;
-
     private boolean isDrawerOpen;
 
     private boolean isDrawerJustClose;
-
-    private Integer numDrawer;
 
     private BeepManager beepManager;
 
@@ -69,6 +67,8 @@ public class CloseDrawerFragment extends Fragment implements CustomArduinoListen
 
         this.isDrawerOpen = true;
 
+        this.arduinoService.setCustomArduinoListener(this);
+
         beepManager = new BeepManager(requireActivity());
 
         TextView timer = root.findViewById(R.id.main_closedrawer_timer);
@@ -81,10 +81,12 @@ public class CloseDrawerFragment extends Fragment implements CustomArduinoListen
                 while (isDrawerOpen) {
                     long millis = System.currentTimeMillis();
 
+                    MediaPlayer mediaPlayer = MediaPlayer.create(requireContext(), R.raw.voice_alert_door);
+                    mediaPlayer.start();
                     beepManager.playBeepSound();
 
                     try {
-                        Thread.sleep(2000 - millis % 2000);
+                        Thread.sleep(6000 - millis % 6000);
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
@@ -105,7 +107,6 @@ public class CloseDrawerFragment extends Fragment implements CustomArduinoListen
 
     @Override
     public void onMessageReceived(final String message) {
-        this.textViewArduinoMessage.setText(message);
         this.askWeight(message);
         this.checkWeight(message);
     }
@@ -115,7 +116,7 @@ public class CloseDrawerFragment extends Fragment implements CustomArduinoListen
             if (message != null && message.contains(ARDUINO_CLOSE)) {
                 this.isDrawerOpen = false;
                 this.isDrawerJustClose = true;
-                this.arduinoService.getWeightBox(this.numDrawer);
+                this.arduinoService.getWeightBox(this.collectorService.getNumDrawer());
             }
         }
     }
@@ -135,8 +136,18 @@ public class CloseDrawerFragment extends Fragment implements CustomArduinoListen
                 }
 
                 int weightOfBox = Integer.parseInt(weightInGram);
-                int minWeight   = Double.valueOf(weightExpected - (weightExpected * PERCENT_WEIGHT_ERROR)).intValue();
-                int maxWeight   = Double.valueOf(weightExpected + (weightExpected * PERCENT_WEIGHT_ERROR)).intValue();
+                double percentOfTolerance;
+                try {
+                    if (this.collectorService.getStockCollector().getWeightTolerancePercent() != null) {
+                        percentOfTolerance = this.collectorService.getStockCollector().getWeightTolerancePercent().doubleValue() / 100;
+                    } else {
+                        percentOfTolerance = PERCENT_WEIGHT_ERROR;
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                int minWeight   = Double.valueOf(weightExpected - (weightExpected * percentOfTolerance)).intValue();
+                int maxWeight   = Double.valueOf(weightExpected + (weightExpected * percentOfTolerance)).intValue();
                 if (minWeight <= weightOfBox && weightOfBox <= maxWeight) {
                     requireActivity().runOnUiThread(this::goToStep4);
                 } else {
@@ -149,6 +160,6 @@ public class CloseDrawerFragment extends Fragment implements CustomArduinoListen
     }
 
     private void goToStep4() {
-        NavHostFragment.findNavController(this).navigate(R.id.action_navigation_closedrawer_to_choice);
+        NavHostFragment.findNavController(this).navigate(R.id.action_navigation_closedrawer_to_voucher);
     }
 }

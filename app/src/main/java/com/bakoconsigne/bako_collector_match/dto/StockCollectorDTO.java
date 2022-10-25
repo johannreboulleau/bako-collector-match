@@ -15,4 +15,5 @@ public class StockCollectorDTO implements Serializable {
 
     private Integer maxPerDrawer;
     private Integer totalDrawer;
+    private Integer weightTolerancePercent;
 }

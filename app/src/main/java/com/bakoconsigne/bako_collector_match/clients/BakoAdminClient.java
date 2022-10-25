@@ -3,10 +3,10 @@ package com.bakoconsigne.bako_collector_match.clients;
 import android.util.Log;
 import com.bakoconsigne.bako_collector_match.MainActivity;
 import com.bakoconsigne.bako_collector_match.dto.BoxTypeDto;
-import com.bakoconsigne.bako_collector_match.dto.ConsumerUserDto;
 import com.bakoconsigne.bako_collector_match.dto.DepositFormDto;
 import com.bakoconsigne.bako_collector_match.dto.LoginDto;
 import com.bakoconsigne.bako_collector_match.dto.LoginResponseDto;
+import com.bakoconsigne.bako_collector_match.dto.MonitoringDto;
 import com.bakoconsigne.bako_collector_match.dto.StockCollectorDTO;
 import com.bakoconsigne.bako_collector_match.dto.UserDto;
 import com.bakoconsigne.bako_collector_match.exceptions.BadRequestException;
@@ -41,7 +41,8 @@ public class BakoAdminClient {
     /**
      * Set a new token to call API
      *
-     * @param token The new token
+     * @param token
+     *     The new token
      */
     public void setToken(final String token) {
         this.token = token;
@@ -128,9 +129,13 @@ public class BakoAdminClient {
     /**
      * Login with username, password and then get token
      *
-     * @param loginDto {@link LoginDto}
+     * @param loginDto
+     *     {@link LoginDto}
+     *
      * @return LoginResponseDto
-     * @throws IOException I/O Exception
+     *
+     * @throws IOException
+     *     I/O Exception
      */
     public LoginResponseDto login(final LoginDto loginDto) throws IOException {
 
@@ -160,9 +165,13 @@ public class BakoAdminClient {
     /**
      * Get current User with token
      *
-     * @param token Token
+     * @param token
+     *     Token
+     *
      * @return UserDto
-     * @throws IOException I/O Exception
+     *
+     * @throws IOException
+     *     I/O Exception
      */
     public UserDto account(final String token) throws IOException {
 
@@ -185,5 +194,42 @@ public class BakoAdminClient {
             Log.e(MainActivity.LOGGER_TAG, "Error to Get current User with token - response = " + response.code() + " - " + response.body().string());
             throw new InternalServerException();
         }
+    }
+
+    /**
+     * Post status of collector for monitoring.
+     *
+     * @param monitoringDto
+     *     the {@link MonitoringDto}
+     *
+     * @return true if ok
+     *
+     * @throws IOException
+     *     I/O Exception
+     */
+    public boolean monitoring(final MonitoringDto monitoringDto) throws IOException {
+
+        OkHttpClient client = new OkHttpClient();
+
+        String json = objectMapper.writeValueAsString(monitoringDto);
+
+        Request request = new Request.Builder()
+            .header(HEADER_AUTHORIZATION, BEARER + token)
+            .url(ADMIN_URL + "/collector-sites/monitoring")
+            .post(RequestBody.create(MediaType.parse("application/json"), json))
+            .build();
+
+        Response response = client.newCall(request).execute();
+
+        if (response.isSuccessful()) {
+            return true;
+        } else if (response.code() == 400) {
+            throw new BadRequestException(response.body().string());
+        } else if (response.code() == 401) {
+            throw new UnauthorizedException();
+        } else {
+            Log.e(MainActivity.LOGGER_TAG, "Error to monitor - response = " + response.code() + " - " + response.body().string());
+        }
+        return false;
     }
 }
