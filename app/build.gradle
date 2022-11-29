@@ -9,7 +9,8 @@ android {
     defaultConfig {
         applicationId "com.bakoconsigne.bako_collector_match"
         minSdkVersion 27
-        targetSdkVersion 32
+//      FIXME  bug with PendingIntent and Arduino dependency if update to 32
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
 
@@ -46,7 +47,7 @@ dependencies {
     implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
     implementation 'com.google.zxing:core:3.5.0'
 
-    implementation 'com.squareup.okhttp:okhttp:2.7.5'
+    implementation 'com.squareup.okhttp3:okhttp:4.10.0'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.4'
     compileOnly 'org.projectlombok:lombok:1.18.24'
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.24'

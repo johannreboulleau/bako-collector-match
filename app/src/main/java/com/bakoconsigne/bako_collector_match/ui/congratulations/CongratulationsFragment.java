@@ -16,30 +16,22 @@ import static com.bakoconsigne.bako_collector_match.MainActivity.TIMER_DELAY_SHO
 
 public class CongratulationsFragment extends Fragment {
 
+    CountDownTimer countDownTimer;
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
         View root = inflater.inflate(R.layout.fragment_main_congratulations, container, false);
 
-        TextView homeImageMenuLabel = requireActivity().findViewById(R.id.bottomAppBar_home_label);
+        TextView homeImageMenuLabel = root.findViewById(R.id.congrats_bottomAppBar_home_label);
         homeImageMenuLabel.setVisibility(View.VISIBLE);
         homeImageMenuLabel.setOnClickListener(v -> goToHome());
 
-        ImageView homeImageMenu = requireActivity().findViewById(R.id.bottomAppBar_home);
+        ImageView homeImageMenu = root.findViewById(R.id.congrats_bottomAppBar_home);
         homeImageMenu.setVisibility(View.VISIBLE);
         homeImageMenu.setOnClickListener(v -> goToHome());
 
-        TextView prevImageMenuLabel = requireActivity().findViewById(R.id.bottomAppBar_prev_label);
-        if (prevImageMenuLabel != null) {
-            prevImageMenuLabel.setVisibility(View.GONE);
-        }
-
-        ImageView prevImageMenu = requireActivity().findViewById(R.id.bottomAppBar_prev);
-        if (prevImageMenu != null) {
-            prevImageMenu.setVisibility(View.GONE);
-        }
-
-        new CountDownTimer(TIMER_DELAY_SHORT, 1000) {
+        this.countDownTimer = new CountDownTimer(TIMER_DELAY_SHORT, 1000) {
             public void onTick(long millisUntilFinished) {
             }
 
@@ -50,7 +42,11 @@ public class CongratulationsFragment extends Fragment {
 
         return root;
     }
+
     private void goToHome() {
+        if (this.countDownTimer != null) {
+            countDownTimer.cancel();
+        }
         NavHostFragment.findNavController(this).navigate(R.id.action_navigation_congratulations_to_home);
     }
 }

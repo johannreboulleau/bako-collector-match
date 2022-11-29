@@ -3,7 +3,7 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="match_parent" xmlns:app="http://schemas.android.com/apk/res-auto"
         tools:context=".ui.step3.CloseDrawerFragment">
 
     <LinearLayout
@@ -30,43 +30,64 @@
 
         </LinearLayout>
 
-        <TextView
-                android:id="@+id/main_closedrawer_step3"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_marginBottom="8dp"
-                android:layout_marginTop="-64dp"
-                android:layout_marginHorizontal="60dp"
-                android:background="@drawable/bg_green"
-                android:textColor="#FFFFFF"
-                android:textSize="24sp"
-                android:gravity="center_vertical|center_horizontal"
-                android:text="@string/main_closedrawer_step"
-        />
-
-        <TextView
-                android:id="@+id/text_opendrawer_explanation"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:textAlignment="center"
-                android:textSize="36sp"
-                android:text="@string/main_closedrawer_title"
-        />
-
         <ImageView
                 android:layout_marginTop="-40dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
                 android:src="@drawable/collector_closed"
-                android:layout_width="500dp"
+                android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:id="@+id/imageView_main_step3"
+                android:id="@+id/imageView_main_step3_deposit"
                 android:layout_weight="1"
                 android:layout_gravity="center"
                 android:contentDescription="@string/main_closedrawer_title"
         />
 
+        <ImageView
+                android:layout_marginTop="-40dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:src="@drawable/error_deposit"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:id="@+id/imageView_main_step3_error"
+                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:contentDescription="@string/main_closedrawer_title"
+        />
+
+        <ImageView
+                android:layout_marginTop="-40dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:src="@drawable/error_technical"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:id="@+id/imageView_main_step3_error_technical"
+                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:contentDescription="@string/main_closedrawer_title"
+                android:visibility="gone"
+        />
+
+    </LinearLayout>
+
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:layout_editor_absoluteX="119dp"
+            android:gravity="center_horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="8dp">
+        <TextView
+                android:text="@string/main_bottomBar_support"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView_contact_support"
+                android:gravity="bottom|center_horizontal"
+                android:layout_gravity="bottom"
+        />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

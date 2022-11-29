@@ -25,16 +25,6 @@ public class ChoiceFragment extends Fragment  {
         ImageView homeImageMenu = requireActivity().findViewById(R.id.bottomAppBar_home);
         homeImageMenu.setVisibility(View.GONE);
 
-        TextView prevImageMenuLabel = requireActivity().findViewById(R.id.bottomAppBar_prev_label);
-        if (prevImageMenuLabel != null) {
-            prevImageMenuLabel.setVisibility(View.GONE);
-        }
-
-        ImageView prevImageMenu = requireActivity().findViewById(R.id.bottomAppBar_prev);
-        if (prevImageMenu != null) {
-            prevImageMenu.setVisibility(View.GONE);
-        }
-
         Button buttonDeposit = root.findViewById(R.id.button_main_choice_deposit);
         buttonDeposit.setOnClickListener(v -> goToStep1ScanBox());
         Button buttonFinish = root.findViewById(R.id.button_main_choice_finish);

@@ -12,6 +12,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceFragmentCompat;
 import com.bakoconsigne.bako_collector_match.exceptions.BadRequestException;
+import com.bakoconsigne.bako_collector_match.exceptions.InternalServerException;
 import com.bakoconsigne.bako_collector_match.exceptions.UnauthorizedException;
 import com.bakoconsigne.bako_collector_match.services.CollectorService;
 import com.bakoconsigne.bako_collector_match.utils.Utils;
@@ -85,7 +86,7 @@ public class SettingsActivity extends AppCompatActivity {
                                   runOnUiThread(() -> getWindow().setBackgroundDrawableResource(android.R.color.background_light));
                               } catch (UnknownHostException e) {
                                   runOnUiThread(() -> Utils.alertError(SettingsActivity.this, ERROR_CONNECTION, (dialog1, which1) -> goToMainActivity(null)));
-                              } catch (IOException e) {
+                              } catch (IOException | InternalServerException e) {
                                   Log.e(LOGGER_TAG, "Error", e);
                                   runOnUiThread(() -> Utils.alertError(SettingsActivity.this, e.getMessage(), (dialog1, which1) -> goToMainActivity(null)));
                               } catch (UnauthorizedException | BadRequestException e) {

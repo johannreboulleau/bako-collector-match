@@ -7,6 +7,7 @@ import com.bakoconsigne.bako_collector_match.dto.DepositFormDto;
 import com.bakoconsigne.bako_collector_match.dto.LoginDto;
 import com.bakoconsigne.bako_collector_match.dto.LoginResponseDto;
 import com.bakoconsigne.bako_collector_match.dto.MonitoringDto;
+import com.bakoconsigne.bako_collector_match.dto.ResetStockDto;
 import com.bakoconsigne.bako_collector_match.dto.StockCollectorDTO;
 import com.bakoconsigne.bako_collector_match.dto.UserDto;
 import com.bakoconsigne.bako_collector_match.exceptions.BadRequestException;
@@ -15,15 +16,20 @@ import com.bakoconsigne.bako_collector_match.exceptions.UnauthorizedException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.Response;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 import java.io.IOException;
 import java.util.List;
 
+import static com.bakoconsigne.bako_collector_match.MainActivity.LOGGER_TAG;
+
+/**
+ * Web client to call main API
+ */
 public class BakoAdminClient {
 
     private static final String ADMIN_URL = "https://administration.bako-consigne.fr/api";
@@ -32,9 +38,48 @@ public class BakoAdminClient {
 
     private static final String BEARER = "Bearer ";
 
+    private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+
     private String token;
 
+    private final ObjectMapper objectMapper = new ObjectMapper()
+        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+    private final OkHttpClient client;
+
+    /**
+     * Constructor
+     */
+    public BakoAdminClient() {
+
+        this.client = new OkHttpClient.Builder()
+            .addInterceptor(chain -> {
+                Request request = chain.request();
+
+                // try the request
+                Response response = chain.proceed(request);
+
+                int       tryCount = 0;
+                final int maxLimit = 3; //Set your max limit here
+
+                while (!response.isSuccessful() && tryCount < maxLimit && response.code() >= 500) {
+
+                    Log.d("intercept", "Request failed - " + tryCount);
+
+                    tryCount++;
+
+                    // retry the request
+                    response = chain.proceed(request);
+                }
+
+                // otherwise just pass the original response on
+                return response;
+            })
+            .build();
+    }
+
     public BakoAdminClient(final String token) {
+        this();
         this.token = token;
     }
 
@@ -48,12 +93,8 @@ public class BakoAdminClient {
         this.token = token;
     }
 
-    private final ObjectMapper objectMapper = new ObjectMapper()
-        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     public List<BoxTypeDto> getListTypeBox() throws IOException {
-
-        OkHttpClient client = new OkHttpClient();
 
         Request request = new Request.Builder()
             .header(HEADER_AUTHORIZATION, BEARER + token)
@@ -70,40 +111,25 @@ public class BakoAdminClient {
         } else if (response.code() == 401) {
             throw new UnauthorizedException();
         } else {
-            Log.e(MainActivity.LOGGER_TAG, "Error to getListTypeBox - response = " + response.code() + " - " + response.body().string());
+            Log.e(LOGGER_TAG, "Error to getListTypeBox - response = " + response.code() + " - " + response.body().string());
             throw new InternalServerException();
         }
     }
 
     public boolean depositBoxes(final DepositFormDto depositFormDto) throws IOException {
 
-        OkHttpClient client = new OkHttpClient();
-
         String json = objectMapper.writeValueAsString(depositFormDto);
 
         Request request = new Request.Builder()
             .header(HEADER_AUTHORIZATION, BEARER + token)
             .url(ADMIN_URL + "/collector-sites/deposit")
-            .post(RequestBody.create(MediaType.parse("application/json"), json))
+            .post(RequestBody.create(json, JSON))
             .build();
 
-        Response response = client.newCall(request).execute();
-
-        if (response.isSuccessful()) {
-            return true;
-        } else if (response.code() == 400) {
-            throw new BadRequestException(response.body().string());
-        } else if (response.code() == 401) {
-            throw new UnauthorizedException();
-        } else {
-            Log.e(MainActivity.LOGGER_TAG, "Error to depositBoxes - response = " + response.code() + " - " + response.body().string());
-            throw new InternalServerException();
-        }
+        return getBooleanResponse(request);
     }
 
     public StockCollectorDTO getStock(final String id) throws IOException {
-
-        OkHttpClient client = new OkHttpClient();
 
         Request request = new Request.Builder()
             .header(HEADER_AUTHORIZATION, BEARER + token)
@@ -111,19 +137,7 @@ public class BakoAdminClient {
             .get()
             .build();
 
-        Response response = client.newCall(request).execute();
-
-        if (response.isSuccessful()) {
-            return objectMapper.readValue(response.body().string(), new TypeReference<StockCollectorDTO>() {
-            });
-        } else if (response.code() == 400) {
-            throw new BadRequestException(response.body().string());
-        } else if (response.code() == 401) {
-            throw new UnauthorizedException();
-        } else {
-            Log.e(MainActivity.LOGGER_TAG, "Error to getStock - response = " + response.code() + " - " + response.body().string());
-            throw new InternalServerException();
-        }
+        return getResponse(request, StockCollectorDTO.class);
     }
 
     /**
@@ -139,27 +153,14 @@ public class BakoAdminClient {
      */
     public LoginResponseDto login(final LoginDto loginDto) throws IOException {
 
-        OkHttpClient client = new OkHttpClient();
-
         String json = objectMapper.writeValueAsString(loginDto);
 
         Request request = new Request.Builder()
             .url(ADMIN_URL + "/authenticate")
-            .post(RequestBody.create(MediaType.parse("application/json"), json))
+            .post(RequestBody.create(json, JSON))
             .build();
 
-        Response response = client.newCall(request).execute();
-
-        if (response.isSuccessful()) {
-            return objectMapper.readValue(response.body().string(), LoginResponseDto.class);
-        } else if (response.code() == 400) {
-            throw new BadRequestException();
-        } else if (response.code() == 401) {
-            throw new UnauthorizedException();
-        } else {
-            Log.e(MainActivity.LOGGER_TAG, "Error to login - response = " + response.code() + " - " + response.body().string());
-            throw new InternalServerException();
-        }
+        return getResponse(request, LoginResponseDto.class);
     }
 
     /**
@@ -175,25 +176,12 @@ public class BakoAdminClient {
      */
     public UserDto account(final String token) throws IOException {
 
-        OkHttpClient client = new OkHttpClient();
-
         Request request = new Request.Builder()
             .header(HEADER_AUTHORIZATION, BEARER + token)
             .url(ADMIN_URL + "/account")
             .build();
 
-        Response response = client.newCall(request).execute();
-
-        if (response.isSuccessful()) {
-            return objectMapper.readValue(response.body().string(), UserDto.class);
-        } else if (response.code() == 400) {
-            throw new BadRequestException();
-        } else if (response.code() == 401) {
-            throw new UnauthorizedException();
-        } else {
-            Log.e(MainActivity.LOGGER_TAG, "Error to Get current User with token - response = " + response.code() + " - " + response.body().string());
-            throw new InternalServerException();
-        }
+        return getResponse(request, UserDto.class);
     }
 
     /**
@@ -209,27 +197,80 @@ public class BakoAdminClient {
      */
     public boolean monitoring(final MonitoringDto monitoringDto) throws IOException {
 
-        OkHttpClient client = new OkHttpClient();
-
         String json = objectMapper.writeValueAsString(monitoringDto);
 
         Request request = new Request.Builder()
             .header(HEADER_AUTHORIZATION, BEARER + token)
             .url(ADMIN_URL + "/collector-sites/monitoring")
-            .post(RequestBody.create(MediaType.parse("application/json"), json))
+            .post(RequestBody.create(json, JSON))
             .build();
 
-        Response response = client.newCall(request).execute();
+        return getBooleanResponse(request);
+    }
 
-        if (response.isSuccessful()) {
-            return true;
-        } else if (response.code() == 400) {
-            throw new BadRequestException(response.body().string());
-        } else if (response.code() == 401) {
-            throw new UnauthorizedException();
-        } else {
-            Log.e(MainActivity.LOGGER_TAG, "Error to monitor - response = " + response.code() + " - " + response.body().string());
+    /**
+     * Post reset stock.
+     *
+     * @param resetStockDto
+     *     the {@link ResetStockDto}
+     *
+     * @return true if ok
+     *
+     * @throws IOException
+     *     I/O Exception
+     */
+    public boolean resetStock(final ResetStockDto resetStockDto) throws IOException {
+
+        String json = objectMapper.writeValueAsString(resetStockDto);
+
+        Request request = new Request.Builder()
+            .header(HEADER_AUTHORIZATION, BEARER + token)
+            .url(ADMIN_URL + "/collector-sites/resetStock")
+            .post(RequestBody.create(json, JSON))
+            .build();
+
+        return getBooleanResponse(request);
+    }
+
+    private boolean getBooleanResponse(final Request request) throws IOException {
+        try (final Response response = this.client.newCall(request).execute()) {
+            if (response.isSuccessful()) {
+                return true;
+            } else if (response.code() == 400) {
+                Log.e(MainActivity.LOGGER_TAG, getBody(response));
+                throw new BadRequestException();
+            } else if (response.code() == 401) {
+                Log.e(MainActivity.LOGGER_TAG, getBody(response));
+                throw new UnauthorizedException();
+            } else {
+                Log.e(MainActivity.LOGGER_TAG, getBody(response));
+                throw new InternalServerException();
+            }
         }
-        return false;
+    }
+
+    private <T> T getResponse(final Request request, Class<T> _class) throws IOException {
+        try (final Response response = this.client.newCall(request).execute()) {
+            if (response.isSuccessful()) {
+                return this.objectMapper.readValue(getBody(response), _class);
+            } else if (response.code() == 400) {
+                throw new BadRequestException();
+            } else if (response.code() == 401) {
+                throw new UnauthorizedException();
+            } else {
+                throw new InternalServerException();
+            }
+        }
+    }
+
+    private String getBody(final Response response) {
+        if (response.body() != null) {
+            try {
+                return response.body().string();
+            } catch (IOException e) {
+                return "";
+            }
+        }
+        return "";
     }
 }

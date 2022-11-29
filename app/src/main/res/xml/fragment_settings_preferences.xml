@@ -13,13 +13,28 @@
         <EditTextPreference
                 app:key="bako_siteId"
                 app:title="@string/settings_preferences_siteId"
-                app:useSimpleSummaryProvider="true"/>
+                app:useSimpleSummaryProvider="true"
+        />
 
         <CheckBoxPreference
                 app:key="bako_arduino_debug"
                 app:title="@string/settings_preferences_arduino_debug"
-                app:useSimpleSummaryProvider="true"/>
+                app:useSimpleSummaryProvider="true"
+        />
+
+        <CheckBoxPreference
+                app:key="bako_disable_check_weight"
+                app:title="@string/settings_preferences_disable_check_weight"
+                app:useSimpleSummaryProvider="true"
+        />
+
+        <CheckBoxPreference
+                app:key="bako_check_weight_greater_only"
+                app:title="@string/settings_preferences_check_weight_greater_only"
+                app:useSimpleSummaryProvider="true"
+        />
 
     </PreferenceCategory>
+
 
 </PreferenceScreen>

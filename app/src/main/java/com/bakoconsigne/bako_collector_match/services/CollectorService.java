@@ -7,6 +7,7 @@ import com.bakoconsigne.bako_collector_match.dto.DepositFormDto;
 import com.bakoconsigne.bako_collector_match.dto.LoginDto;
 import com.bakoconsigne.bako_collector_match.dto.LoginResponseDto;
 import com.bakoconsigne.bako_collector_match.dto.MonitoringDto;
+import com.bakoconsigne.bako_collector_match.dto.ResetStockDto;
 import com.bakoconsigne.bako_collector_match.dto.StockCollectorDTO;
 import com.bakoconsigne.bako_collector_match.dto.UserDto;
 import com.bakoconsigne.bako_collector_match.exceptions.BoxTypeSettingsException;
@@ -29,6 +30,8 @@ public class CollectorService {
 
     private static final String ROLE_ADMIN = "ROLE_ADMIN";
 
+    private static final String ROLE_COLLECTOR = "ROLE_COLLECTOR";
+
     private static final CollectorService INSTANCE = new CollectorService();
 
     private BakoAdminClient client;
@@ -38,6 +41,14 @@ public class CollectorService {
     private final Map<String, Integer> mapBox = new HashMap<>();
 
     private String siteId;
+
+    @Getter
+    @Setter
+    private boolean disableCheckWeight = false;
+
+    @Getter
+    @Setter
+    private boolean checkWeightGreaterOnly = false;
 
     private StockCollectorDTO stockCollector;
 
@@ -57,16 +68,13 @@ public class CollectorService {
     /**
      * Get list fo box
      *
-     * @return List of {@link BoxTypeDto}
-     *
      * @throws IOException
      *     I/O Exception
      */
-    public List<BoxTypeDto> loadListBoxType() throws IOException {
+    public void loadListBoxType() throws IOException {
         if (this.boxTypeList.isEmpty()) {
             this.boxTypeList.addAll(client.getListTypeBox());
         }
-        return this.boxTypeList;
     }
 
     /**
@@ -143,11 +151,20 @@ public class CollectorService {
         }
     }
 
+    /**
+     * Add box in the map
+     *
+     * @param boxTypId
+     *     Box type ID
+     */
     public void addBoxInMemory(final String boxTypId) {
         this.mapBox.computeIfPresent(boxTypId, (key, total) -> total + 1);
         this.mapBox.putIfAbsent(boxTypId, 1);
     }
 
+    /**
+     * Clear the cache.
+     */
     public void clear() {
         this.mapBox.clear();
         this.stockCollector = null;
@@ -201,6 +218,7 @@ public class CollectorService {
         final DepositFormDto formDto = new DepositFormDto();
         formDto.setMapBoxes(mapBox);
         formDto.setSiteId(siteId);
+        formDto.setNumDrawer(getNumDrawer());
 
         return client.depositBoxes(formDto);
     }
@@ -208,17 +226,25 @@ public class CollectorService {
     /**
      * Monitor collector status
      *
+     * @param batteryPercent
+     *     the battery percent
+     * @param status
+     *     the message
+     * @param isException
+     *     true if it is an exception
+     *
      * @return True if ok
      *
      * @throws IOException
      *     I/O Exception
      */
-    public boolean monitoring(final float batteryPercent, final String status) throws IOException {
+    public boolean monitoring(final float batteryPercent, final String status, final boolean isException) throws IOException {
 
         final MonitoringDto monitoringDto = new MonitoringDto();
         monitoringDto.setSiteId(siteId);
         monitoringDto.setBatteryPercent(batteryPercent);
-        monitoringDto.setStatus(status);
+        monitoringDto.setStatus(status != null && !"".equals(status.trim()) ? status : "N/A");
+        monitoringDto.setException(isException);
 
         if (client != null) {
             return client.monitoring(monitoringDto);
@@ -252,6 +278,31 @@ public class CollectorService {
     }
 
     /**
+     * Login and check if the user has admin role or collector role
+     *
+     * @param login
+     *     The login
+     * @param password
+     *     The password
+     *
+     * @return True if ok or false
+     *
+     * @throws IOException
+     *     I/O Exception
+     */
+    public boolean loginAndIsAdminOrCollector(final String login, final String password) throws IOException {
+
+        final LoginDto loginDto = new LoginDto();
+        loginDto.setUsername(login);
+        loginDto.setPassword(password);
+        LoginResponseDto loginResponseDto = this.client.login(loginDto);
+
+        final UserDto userDto = this.client.account(loginResponseDto.getId_token());
+
+        return userDto.getAuthorities().stream().anyMatch(role -> ROLE_ADMIN.equals(role) || ROLE_COLLECTOR.equals(role));
+    }
+
+    /**
      * Get stock of collector
      *
      * @return StockCollectorDTO
@@ -264,5 +315,31 @@ public class CollectorService {
             this.stockCollector = this.client.getStock(siteId);
         }
         return this.stockCollector;
+    }
+
+    /**
+     * Reset the stock of collector when collect man takes boxes.
+     *
+     * @return true of false
+     *
+     * @throws IOException
+     *     I/O Exception
+     */
+    public boolean resetStock(final boolean isChangeTicket) throws IOException {
+
+        final ResetStockDto resetStockDto = new ResetStockDto();
+        resetStockDto.setSiteId(siteId);
+        resetStockDto.setChangeTicketPaper(isChangeTicket);
+
+        return this.client.resetStock(resetStockDto);
+    }
+
+    /**
+     * Return the list of box type ID join by comma
+     *
+     * @return a String
+     */
+    public String getListBoxRef() {
+        return String.join(", ", this.mapBox.keySet());
     }
 }

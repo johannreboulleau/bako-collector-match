@@ -62,10 +62,16 @@ public class ArduinoService {
         arduino.send(("pb1" + numDrawer).getBytes());
     }
 
+    /**
+     * Open all drawers
+     */
     public void open() {
         arduino.send("open".getBytes());
     }
 
+    /**
+     * Close all drawers
+     */
     public void close() {
         arduino.send("close".getBytes());
     }

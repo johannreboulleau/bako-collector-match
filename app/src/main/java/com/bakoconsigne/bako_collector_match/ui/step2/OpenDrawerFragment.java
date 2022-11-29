@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
@@ -16,6 +15,8 @@ import com.bakoconsigne.bako_collector_match.R;
 import com.bakoconsigne.bako_collector_match.dto.StockCollectorDTO;
 import com.bakoconsigne.bako_collector_match.dto.StockDTO;
 import com.bakoconsigne.bako_collector_match.dto.StockDrawerDTO;
+import com.bakoconsigne.bako_collector_match.exceptions.BadRequestException;
+import com.bakoconsigne.bako_collector_match.exceptions.InternalServerException;
 import com.bakoconsigne.bako_collector_match.exceptions.UnauthorizedException;
 import com.bakoconsigne.bako_collector_match.listeners.CustomArduinoListener;
 import com.bakoconsigne.bako_collector_match.services.ArduinoService;
@@ -27,7 +28,9 @@ import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
 
+import static com.bakoconsigne.bako_collector_match.MainActivity.ERROR_BAD_REQUEST;
 import static com.bakoconsigne.bako_collector_match.MainActivity.ERROR_CONNECTION;
+import static com.bakoconsigne.bako_collector_match.MainActivity.ERROR_SERVER;
 import static com.bakoconsigne.bako_collector_match.MainActivity.ERROR_UNAUTHORIZED;
 import static com.bakoconsigne.bako_collector_match.MainActivity.TIMER_DELAY_LONG;
 
@@ -45,21 +48,11 @@ public class OpenDrawerFragment extends Fragment implements CustomArduinoListene
 
         View root = inflater.inflate(R.layout.fragment_main_opendrawer, container, false);
 
-        TextView homeImageMenuLabel = requireActivity().findViewById(R.id.bottomAppBar_home_label);
-        homeImageMenuLabel.setVisibility(View.GONE);
+        TextView homeImageMenuLabel = root.findViewById(R.id.open_drawer_bottomAppBar_home_label);
+        homeImageMenuLabel.setOnClickListener(item -> goToHome());
 
-        ImageView homeImageMenu = requireActivity().findViewById(R.id.bottomAppBar_home);
-        homeImageMenu.setVisibility(View.GONE);
-
-        TextView prevImageMenuLabel = requireActivity().findViewById(R.id.bottomAppBar_prev_label);
-        if (prevImageMenuLabel != null) {
-            prevImageMenuLabel.setVisibility(View.GONE);
-        }
-
-        ImageView prevImageMenu = requireActivity().findViewById(R.id.bottomAppBar_prev);
-        if (prevImageMenu != null) {
-            prevImageMenu.setVisibility(View.GONE);
-        }
+        ImageView homeImageMenu = root.findViewById(R.id.open_drawer_bottomAppBar_home);
+        homeImageMenu.setOnClickListener(item -> goToHome());
 
         TextView timer = root.findViewById(R.id.main_opendrawer_timer);
         countDownTimer = new CountDownTimer(TIMER_DELAY_LONG, 1000) {
@@ -70,14 +63,9 @@ public class OpenDrawerFragment extends Fragment implements CustomArduinoListene
             }
 
             public void onFinish() {
-                arduinoService.close();
                 goToHome();
             }
         }.start();
-
-        ImageView imageView = root.findViewById(R.id.imageView_main_step2);
-        //TODO remove
-        imageView.setOnClickListener(v -> goToStep3());
 
         this.arduinoService.setCustomArduinoListener(this);
 
@@ -99,14 +87,14 @@ public class OpenDrawerFragment extends Fragment implements CustomArduinoListene
                                                                                                          .map(StockDTO::getQuantity)
                                                                                                          .reduce(Integer::sum)
                                                                                                          .orElse(0);
-                                                                        return !((totalBox + collectorService.getTotalBoxes()) > stockCollector.getMaxPerDrawer());
+                                                                        return ((totalBox + collectorService.getTotalBoxes()) <= stockCollector.getMaxPerDrawer());
                                                                     })
                                                                     .findFirst()
                                                                     .orElse(null);
 
                 if (stockDrawerAvailable == null) {
-                    requireActivity().runOnUiThread(() -> Utils.alertError(requireActivity(), "Tous les tiroirs sont pleins, le dépot est impossible. Veuillez nous "
-                        + "excuser pour la gêne occasionnée. " + stockCollector.getDrawers().size()));
+                    requireActivity().runOnUiThread(() -> Utils.alertError(requireActivity(),
+                                                                           "Tous les tiroirs sont pleins, veuillez nous excuser pour la gêne occasionnée. Veuillez contacter l’accueil du magasin"));
                 } else {
                     // then open
                     this.collectorService.setNumDrawer(stockDrawerAvailable.getNumDrawer());
@@ -116,13 +104,18 @@ public class OpenDrawerFragment extends Fragment implements CustomArduinoListene
                 requireActivity().runOnUiThread(() -> Utils.alertError(requireActivity(), ERROR_UNAUTHORIZED));
             } catch (IOException e) {
                 requireActivity().runOnUiThread(() -> Utils.alertError(requireActivity(), ERROR_CONNECTION));
+            } catch (InternalServerException e) {
+                requireActivity().runOnUiThread(() -> Utils.alertError(requireActivity(), ERROR_SERVER));
+            } catch (BadRequestException e) {
+                requireActivity().runOnUiThread(() -> Utils.alertError(requireActivity(), ERROR_BAD_REQUEST));
             }
         }).start();
     }
 
     @Override
     public void onMessageReceived(final String message) {
-        if (message != null && message.contains(ARDUINO_OPEN)) {
+
+        if (message != null && message.contains(ARDUINO_OPEN) && getActivity() != null) {
             requireActivity().runOnUiThread(this::goToStep3);
         }
     }
@@ -133,6 +126,7 @@ public class OpenDrawerFragment extends Fragment implements CustomArduinoListene
     }
 
     private void goToHome() {
+        countDownTimer.cancel();
         NavHostFragment.findNavController(this).navigate(R.id.action_navigation_opendrawer_to_home);
     }
 }

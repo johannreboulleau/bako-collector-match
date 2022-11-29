@@ -63,6 +63,10 @@
         <action
                 android:id="@+id/action_navigation_closedrawer_to_voucher"
                 app:destination="@id/VoucherFragment"/>
+
+        <action
+                android:id="@+id/action_navigation_closedrawer_to_home"
+                app:destination="@id/HomeFragment"/>
     </fragment>
 
     <fragment

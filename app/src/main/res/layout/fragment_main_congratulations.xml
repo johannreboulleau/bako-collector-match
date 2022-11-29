@@ -8,68 +8,97 @@
         tools:context=".ui.congratulations.CongratulationsFragment">
 
     <ImageView
-            android:layout_width="230dp"
-            android:layout_height="wrap_content"
-            app:srcCompat="@drawable/logo_bako"
-            android:layout_weight="2"
-            android:id="@+id/main_logo_bako"
-            android:contentDescription="@string/header_logo_description"
-            android:visibility="visible"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="16dp" />
-
-    <ImageView
-            android:layout_width="230dp"
-            android:layout_height="wrap_content"
-            app:srcCompat="@drawable/logo_match"
-            android:layout_weight="2"
-            android:id="@+id/main_logo_match"
-            android:contentDescription="@string/header_logo_match_description"
-            android:visibility="visible"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="270dp"
-            android:layout_marginTop="16dp" />
-
-    <LinearLayout
-            android:orientation="vertical"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:src="@drawable/thanks"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginTop="64dp"
-            android:gravity="center"
-    >
+            android:id="@+id/imageView_main_step6"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:contentDescription="@string/main_congratulations_thanks"
+    />
 
+
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:layout_editor_absoluteX="119dp"
+            android:gravity="center_horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="16dp">
         <TextView
-                android:id="@+id/text_notifications"
+                android:text="@string/main_bottomBar_support"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView_contact_support"
+                android:gravity="bottom|center_horizontal"
+                android:layout_gravity="bottom"
+        />
+    </LinearLayout>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/bottomAppBarParent">
+
+        <com.google.android.material.bottomappbar.BottomAppBar
+                android:id="@+id/bottomAppBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="32dp"
-                android:layout_marginEnd="8dp"
-                android:textAlignment="center"
-                android:textSize="36sp"
-                android:text="@string/main_congratulations_thanks"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                android:layout_marginTop="0dp"
-                android:layout_marginBottom="48dp"
-        />
+                android:layout_gravity="bottom|center_horizontal"
+                android:paddingStart="40dp"
+                android:paddingLeft="40dp"
+                android:paddingEnd="40dp"
+                android:paddingRight="40dp"
+                app:fabAlignmentMode="center"
+        >
 
-        <ImageView
-                android:layout_marginTop="8dp"
-                android:src="@drawable/thanks"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:id="@+id/imageView_main_step6"
-                android:layout_weight="1"
-                android:layout_gravity="center"
-                android:contentDescription="@string/main_congratulations_thanks"
-        />
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal">
 
-    </LinearLayout>
+                <RelativeLayout
+                        android:id="@+id/relative"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="64dp"
+                        android:layout_marginEnd="64dp"
+                >
+
+                    <ImageView
+                            android:id="@+id/congrats_bottomAppBar_home"
+                            android:layout_width="42dp"
+                            android:src="@drawable/ic_home_black_24dp"
+                            app:tint="@color/green"
+                            android:contentDescription="@string/main_bottomBar_home"
+                            android:layout_centerHorizontal="true"
+                            android:layout_height="42dp"
+                            android:visibility="gone"
+                    />
+
+                    <TextView
+                            android:id="@+id/congrats_bottomAppBar_home_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/congrats_bottomAppBar_home"
+                            android:layout_centerInParent="true"
+                            android:singleLine="true"
+                            android:text="@string/main_bottomBar_home"
+                            android:textColor="@color/green"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:visibility="gone"
+                    />
+                </RelativeLayout>
+
+            </LinearLayout>
+
+        </com.google.android.material.bottomappbar.BottomAppBar>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

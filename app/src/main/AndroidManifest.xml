@@ -6,8 +6,17 @@
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.INTERNET"/>
 
+    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
     <uses-feature android:name="android.hardware.camera"/>
     <uses-feature android:name="android.hardware.camera.autofocus"/>
+
+    <uses-feature android:name="android.hardware.bluetooth" android:required="true" />
+    <uses-feature android:name="android.hardware.bluetooth_le" android:required="true" />
 
     <uses-feature android:name="android.hardware.usb.host" />
 
@@ -41,6 +50,14 @@
                 android:name=".SettingsActivity"
                 android:screenOrientation="landscape"
                 android:label="@string/settings_title"
+                android:parentActivityName=".MainActivity"
+                android:theme="@style/Theme.AppCompat.Light"
+        >
+        </activity>
+        <activity
+                android:name=".ResetCollectActivity"
+                android:screenOrientation="landscape"
+                android:label="@string/reset_stock_title"
                 android:parentActivityName=".MainActivity"
                 android:theme="@style/Theme.AppCompat.Light"
         >

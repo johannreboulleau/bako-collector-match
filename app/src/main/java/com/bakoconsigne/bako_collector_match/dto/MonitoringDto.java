@@ -15,4 +15,6 @@ public class MonitoringDto implements Serializable {
     private String status;
 
     private float batteryPercent;
+
+    private boolean isException;
 }

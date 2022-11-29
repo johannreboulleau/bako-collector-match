@@ -15,4 +15,5 @@ public class DepositFormDto implements Serializable {
     private String siteId;
 
     private Map<String, Integer> mapBoxes;
+    private Integer numDrawer;
 }

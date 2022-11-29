@@ -1,8 +1,10 @@
 package com.bakoconsigne.bako_collector_match.ui.step1;
 
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +17,9 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 import com.bakoconsigne.bako_collector_match.R;
+import com.bakoconsigne.bako_collector_match.exceptions.BadRequestException;
+import com.bakoconsigne.bako_collector_match.exceptions.InternalServerException;
+import com.bakoconsigne.bako_collector_match.exceptions.UnauthorizedException;
 import com.bakoconsigne.bako_collector_match.services.CollectorService;
 import com.bakoconsigne.bako_collector_match.utils.Utils;
 import com.google.zxing.BarcodeFormat;
@@ -28,14 +33,20 @@ import com.journeyapps.barcodescanner.camera.CameraSettings;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import static android.view.View.GONE;
 import static android.view.View.INVISIBLE;
+import static com.bakoconsigne.bako_collector_match.MainActivity.ERROR_BAD_REQUEST;
 import static com.bakoconsigne.bako_collector_match.MainActivity.ERROR_CONNECTION;
+import static com.bakoconsigne.bako_collector_match.MainActivity.ERROR_SERVER;
+import static com.bakoconsigne.bako_collector_match.MainActivity.ERROR_UNAUTHORIZED;
 import static com.bakoconsigne.bako_collector_match.MainActivity.LOGGER_TAG;
+import static com.bakoconsigne.bako_collector_match.MainActivity.TIMER_DELAY_LONG;
 
 public class ScanBoxFragment extends Fragment {
 
@@ -49,26 +60,28 @@ public class ScanBoxFragment extends Fragment {
 
     private String lastText;
 
+    private CountDownTimer countDownTimer;
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
-        View root = inflater.inflate(R.layout.fragment_main_scanbox, container, false);
+        final View root = inflater.inflate(R.layout.fragment_main_scanbox, container, false);
 
         barcodeView = root.findViewById(R.id.barcode_view_box);
 
-        CameraSettings settings = barcodeView.getBarcodeView().getCameraSettings();
+        final CameraSettings settings = barcodeView.getBarcodeView().getCameraSettings();
         if (settings.getRequestedCameraId() != Camera.CameraInfo.CAMERA_FACING_FRONT) {
             settings.setRequestedCameraId(Camera.CameraInfo.CAMERA_FACING_FRONT);
         }
         barcodeView.getBarcodeView().setCameraSettings(settings);
 
-        Collection<BarcodeFormat> formats = Arrays.asList(BarcodeFormat.QR_CODE, BarcodeFormat.EAN_13);
+        final Collection<BarcodeFormat> formats = Arrays.asList(BarcodeFormat.QR_CODE, BarcodeFormat.EAN_13);
         barcodeView.getBarcodeView().setDecoderFactory(new DefaultDecoderFactory(formats));
         barcodeView.decodeSingle(callback);
 
         beepManager = new BeepManager(requireActivity());
 
-        Button buttonRetry = root.findViewById(R.id.button_nav_retry);
+        final Button buttonRetry = root.findViewById(R.id.button_nav_retry);
         buttonRetry.setOnClickListener(v -> {
 
             TextView textView = requireView().findViewById(R.id.fragmentScan_textView_error);
@@ -80,30 +93,30 @@ public class ScanBoxFragment extends Fragment {
             barcodeView.setVisibility(View.VISIBLE);
             barcodeView.decodeSingle(callback);
 
-            ImageView imageView = requireView().findViewById(R.id.imageView_step1);
+            final ImageView imageView = requireView().findViewById(R.id.imageView_step1);
             imageView.setVisibility(View.VISIBLE);
         });
-        //TODO remove
-        barcodeView.setOnClickListener(v -> goToStep2());
 
-        TextView homeImageMenuLabel = requireActivity().findViewById(R.id.bottomAppBar_home_label);
+        final TextView homeImageMenuLabel = root.findViewById(R.id.bottomAppBar_home_label);
         homeImageMenuLabel.setVisibility(this.collectorService.getTotalBoxes() < 1 ? View.VISIBLE : View.GONE);
         homeImageMenuLabel.setOnClickListener(item -> goToHome());
 
-        ImageView homeImageMenu = requireActivity().findViewById(R.id.bottomAppBar_home);
+        final ImageView homeImageMenu = root.findViewById(R.id.bottomAppBar_home);
         homeImageMenu.setVisibility(this.collectorService.getTotalBoxes() < 1 ? View.VISIBLE : View.GONE);
         homeImageMenu.setOnClickListener(item -> goToHome());
 
-        TextView prevImageMenuLabel = requireActivity().findViewById(R.id.bottomAppBar_prev_label);
-        if (prevImageMenuLabel != null) {
-            prevImageMenuLabel.setVisibility(this.collectorService.getTotalBoxes() > 0 ? View.VISIBLE : View.GONE);
-            prevImageMenuLabel.setOnClickListener(v -> gotToStep4Choice());
-        }
+        final TextView timer = root.findViewById(R.id.main_scanbox_opendrawer_timer);
+        countDownTimer = new CountDownTimer(TIMER_DELAY_LONG, 1000) {
 
-        ImageView prevImageMenu = requireActivity().findViewById(R.id.bottomAppBar_prev);
-        if (prevImageMenu != null) {
-            prevImageMenu.setVisibility(View.GONE);
-        }
+            @SuppressLint("SimpleDateFormat")
+            public void onTick(long millisUntilFinished) {
+                timer.setText(new SimpleDateFormat("mm:ss").format(new Date(millisUntilFinished)));
+            }
+
+            public void onFinish() {
+                goToHome();
+            }
+        }.start();
 
         return root;
     }
@@ -162,6 +175,12 @@ public class ScanBoxFragment extends Fragment {
                     }
                 } catch (IOException e) {
                     requireActivity().runOnUiThread(() -> Utils.alertError(getActivity(), ERROR_CONNECTION));
+                } catch (InternalServerException e) {
+                    requireActivity().runOnUiThread(() -> Utils.alertError(requireActivity(), ERROR_SERVER));
+                } catch (BadRequestException e) {
+                    requireActivity().runOnUiThread(() -> Utils.alertError(requireActivity(), ERROR_BAD_REQUEST));
+                } catch (UnauthorizedException e) {
+                    requireActivity().runOnUiThread(() -> Utils.alertError(requireActivity(), ERROR_UNAUTHORIZED));
                 }
             }).start();
         }
@@ -194,10 +213,13 @@ public class ScanBoxFragment extends Fragment {
     }
 
     private void goToStep2() {
+        this.countDownTimer.cancel();
         NavHostFragment.findNavController(this).navigate(R.id.action_navigation_scan_to_opendrawer);
     }
 
     private void goToHome() {
+        this.countDownTimer.cancel();
+        this.barcodeView.pauseAndWait();
         NavHostFragment.findNavController(this).navigate(R.id.action_navigation_scan_to_navigation_home);
     }
 
